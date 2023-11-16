@@ -5,7 +5,7 @@ import PostDetail from './post-detail';
 
 const Router = () => {
 	return (
-		<BrowserRouter>
+		<BrowserRouter basename="/react-infinite-scroll">
 			<Routes>
 				<Route path="" element={<Main />} />
 				<Route path=":postId" element={<PostDetail />} />

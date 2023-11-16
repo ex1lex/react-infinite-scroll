@@ -4,6 +4,7 @@ import ReactDOM from 'react-dom/client';
 import reportWebVitals from './reportWebVitals';
 import Router from './pages';
 import { store } from './core/store';
+import 'react-virtualized/styles.css';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(

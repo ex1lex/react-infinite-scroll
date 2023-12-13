@@ -1,11 +1,19 @@
 import React, { useCallback, useMemo } from 'react';
-import './index.scss';
 import { useNavigate, useParams } from 'react-router-dom';
-import { useGetPostQuery } from '../../core/api';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import './index.scss';
 
 const PostDetail = () => {
+	const queryClient = useQueryClient();
 	const { postId } = useParams();
-	const { data, isLoading } = useGetPostQuery(postId);
+	const { isFetching, data } = useQuery({
+		initialData: queryClient.getQueryData(['post', postId]),
+		queryKey: ['post', postId],
+		queryFn: ({ queryKey: [_, id] }) =>
+			fetch(`https://jsonplaceholder.typicode.com/posts/${id}`).then((res) =>
+				res.json()
+			),
+	});
 
 	const navigate = useNavigate();
 
@@ -17,7 +25,7 @@ const PostDetail = () => {
 		}
 	}, [data]);
 
-	if (isLoading) {
+	if (isFetching) {
 		return <h5>Loading...</h5>;
 	}
 

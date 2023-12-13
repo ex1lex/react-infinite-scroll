@@ -1,17 +1,18 @@
 import React from 'react';
-import { Provider } from 'react-redux';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import ReactDOM from 'react-dom/client';
 import reportWebVitals from './reportWebVitals';
 import Router from './pages';
-import { store } from './core/store';
 import 'react-virtualized/styles.css';
+
+const queryClient = new QueryClient();
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
 	<React.StrictMode>
-		<Provider store={store}>
+		<QueryClientProvider client={queryClient}>
 			<Router />
-		</Provider>
+		</QueryClientProvider>
 	</React.StrictMode>
 );
 

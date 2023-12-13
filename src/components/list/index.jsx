@@ -1,29 +1,36 @@
-import React, { useEffect, useState, useCallback, useMemo } from 'react';
+import React, { useCallback, useMemo } from 'react';
+import { useInfiniteQuery } from '@tanstack/react-query';
 import {
 	AutoSizer,
 	InfiniteLoader,
 	List as VirtualizedList,
 } from 'react-virtualized';
-import { useGetPostsQuery } from '../../core/api';
 import Item from '../item';
 import './index.scss';
 
 const List = () => {
-	const [isAllowFetching, setIsAllowFetching] = useState(true);
-	const [page, setPage] = useState(1);
-	const { currentData, isFetching } = useGetPostsQuery(page, {
-		skip: !isAllowFetching,
+	const { data, fetchNextPage, hasNextPage, isFetching } = useInfiniteQuery({
+		queryKey: ['posts'],
+		queryFn: ({ pageParam }) =>
+			fetch(
+				`https://jsonplaceholder.typicode.com/posts/?_page=${pageParam}&_limit=20`
+			).then((res) => res.json()),
+		initialPageParam: 1,
+		getNextPageParam: (lastPage, _pages, lastPageParam) =>
+			lastPage.length > 0 ? lastPageParam + 1 : undefined,
 	});
 
-	const [listData, setListData] = useState([]);
+	const listData = useMemo(() => {
+		return data?.pages?.flat() ?? [];
+	}, [data]);
 
 	const isRowLoaded = useCallback(({ index }) => !!listData[index], [listData]);
 
 	const loadMoreRows = useCallback(() => {
-		if (!isFetching && isAllowFetching) {
-			setPage((prevPage) => prevPage + 1);
+		if (!isFetching && hasNextPage) {
+			fetchNextPage();
 		}
-	}, [isFetching, isAllowFetching]);
+	}, [isFetching, hasNextPage, fetchNextPage]);
 
 	const rowRenderer = useCallback(
 		({ key, index, style }) => {
@@ -44,16 +51,6 @@ const List = () => {
 		() => (isFetching ? listData.length + 1 : listData.length),
 		[listData, isFetching]
 	);
-
-	useEffect(() => {
-		if (currentData?.length === 0) {
-			setIsAllowFetching(false);
-			return;
-		}
-		if (currentData) {
-			setListData((prevData) => [...prevData, ...currentData]);
-		}
-	}, [currentData]);
 
 	return (
 		<div className="list">

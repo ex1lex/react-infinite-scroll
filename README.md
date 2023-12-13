@@ -5,6 +5,6 @@
 [Preview](https://ex1lex.github.io/react-infinite-scroll/)
 
 Используемые технологии:
-- @reduxjs/toolkit
+- react-query
 - react-virtualized
 - react
